@@ -22,6 +22,8 @@ test("locks the experience to one viewport without page scrolling", async () => 
 
   assert.match(css, /html,\s*\nbody\s*\{[^}]*height:\s*100%[^}]*overflow:\s*hidden/s);
   assert.match(css, /#root\s*\{[^}]*height:\s*100%[^}]*overflow:\s*hidden/s);
-  assert.match(css, /\.daily-page\s*\{[^}]*position:\s*fixed[^}]*inset:\s*0/s);
+  assert.match(css, /html,\s*\nbody\s*\{[^}]*background:\s*var\(--page-background,\s*#082f3d\)/s);
+  assert.match(css, /#root\s*\{[^}]*background:\s*var\(--page-background,\s*#082f3d\)/s);
+  assert.match(css, /\.daily-page\s*\{[^}]*position:\s*fixed[^}]*inset:\s*-2px/s);
   assert.match(css, /grid-template-rows:\s*auto minmax\(0,\s*1fr\) auto/);
 });

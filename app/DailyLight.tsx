@@ -35,6 +35,19 @@ export function DailyLight() {
   const [now, setNow] = useState(() => new Date());
   const [feedback, setFeedback] = useState<Feedback>("idle");
   const experience = useMemo(() => getDailyExperience(now), [now]);
+  const theme = experience.theme;
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    root.style.setProperty("--page-background", theme.background);
+    body.style.backgroundColor = theme.background;
+
+    return () => {
+      root.style.removeProperty("--page-background");
+      body.style.backgroundColor = "";
+    };
+  }, [theme.background]);
 
   const refreshDate = useCallback(() => {
     setNow((current) => {
@@ -117,7 +130,6 @@ export function DailyLight() {
     }
   };
 
-  const theme = experience.theme;
   const style = {
     "--bg": theme.background,
     "--fg": theme.foreground,

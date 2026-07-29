@@ -13,3 +13,15 @@ test("builds a GitHub Pages entry with repository-relative assets", async () => 
   assert.match(html, /https:\/\/zealous-built\.github\.io\/daily-light-cn\/og\.png/);
   assert.doesNotMatch(html, /src="\/assets\//);
 });
+
+test("locks the experience to one viewport without page scrolling", async () => {
+  const css = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(css, /html,\s*\nbody\s*\{[^}]*height:\s*100%[^}]*overflow:\s*hidden/s);
+  assert.match(css, /#root\s*\{[^}]*height:\s*100%[^}]*overflow:\s*hidden/s);
+  assert.match(css, /\.daily-page\s*\{[^}]*height:\s*100svh[^}]*max-height:\s*100svh/s);
+  assert.match(css, /grid-template-rows:\s*auto minmax\(0,\s*1fr\) auto/);
+});

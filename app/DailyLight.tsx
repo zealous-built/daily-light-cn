@@ -157,7 +157,7 @@ export function DailyLight() {
       </div>
 
       <header className="site-header">
-        <a className="brand" href="/" aria-label="日日向光首页">
+        <a className="brand" href="./" aria-label="日日向光首页">
           <span className="brand-sun" aria-hidden="true">日</span>
           <span>
             <strong>日日向光</strong>

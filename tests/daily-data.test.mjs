@@ -1,0 +1,69 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  getDailyExperience,
+  getLocalDayKey,
+  quotes,
+  themes,
+} from "../app/daily.ts";
+
+test("ships 366 unique original quotes", () => {
+  assert.equal(quotes.length, 366);
+  assert.equal(new Set(quotes.map((quote) => quote.id)).size, 366);
+  assert.equal(new Set(quotes.map((quote) => quote.text)).size, 366);
+  assert.ok(quotes.every((quote) => quote.text.trim().length >= 20));
+});
+
+test("ships 120 complete, uniquely named themes", () => {
+  assert.equal(themes.length, 120);
+  assert.equal(new Set(themes.map((theme) => theme.id)).size, 120);
+  assert.equal(new Set(themes.map((theme) => theme.name)).size, 120);
+  for (const theme of themes) {
+    for (const field of [
+      "background",
+      "foreground",
+      "accent",
+      "surface",
+      "muted",
+      "glow",
+      "fontFamily",
+      "layout",
+      "decor",
+      "motion",
+    ]) {
+      assert.ok(theme[field], `${theme.id} is missing ${field}`);
+    }
+  }
+});
+
+test("keeps a local day stable and changes both selections tomorrow", () => {
+  const morning = new Date(2026, 6, 29, 8, 15);
+  const evening = new Date(2026, 6, 29, 23, 59);
+  const tomorrow = new Date(2026, 6, 30, 0, 0);
+  const first = getDailyExperience(morning);
+  const sameDay = getDailyExperience(evening);
+  const nextDay = getDailyExperience(tomorrow);
+
+  assert.equal(getLocalDayKey(morning), "2026-07-29");
+  assert.equal(first.quote.id, sameDay.quote.id);
+  assert.equal(first.theme.id, sameDay.theme.id);
+  assert.notEqual(first.quote.id, nextDay.quote.id);
+  assert.notEqual(first.theme.id, nextDay.theme.id);
+});
+
+test("handles month, year and leap-day boundaries", () => {
+  const boundaries = [
+    [new Date(2026, 0, 31, 23, 59), new Date(2026, 1, 1, 0, 0)],
+    [new Date(2026, 11, 31, 23, 59), new Date(2027, 0, 1, 0, 0)],
+    [new Date(2028, 1, 28, 23, 59), new Date(2028, 1, 29, 0, 0)],
+    [new Date(2028, 1, 29, 23, 59), new Date(2028, 2, 1, 0, 0)],
+  ];
+
+  for (const [before, after] of boundaries) {
+    const first = getDailyExperience(before);
+    const second = getDailyExperience(after);
+    assert.notEqual(first.dayKey, second.dayKey);
+    assert.notEqual(first.quote.id, second.quote.id);
+    assert.notEqual(first.theme.id, second.theme.id);
+  }
+});

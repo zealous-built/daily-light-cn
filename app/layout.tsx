@@ -1,0 +1,42 @@
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import "./globals.css";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
+  const origin = host ? `${protocol}://${host}` : "http://localhost:4321";
+  const imageUrl = new URL("/og.png", origin).toString();
+
+  return {
+    title: "日日向光｜每天一句，向光而行",
+    description: "每天零点更新一句原创励志短句与一套全新视觉风格，让每次打开都有新的力量。",
+    applicationName: "日日向光",
+    keywords: ["每日一句", "励志", "日签", "正能量", "日日向光"],
+    openGraph: {
+      title: "日日向光｜每天一句，向光而行",
+      description: "每天一句原创励志短句，每天一套全新视觉风格。",
+      type: "website",
+      locale: "zh_CN",
+      siteName: "日日向光",
+      images: [{ url: imageUrl, width: 1536, height: 1024, alt: "日日向光｜每天一句，向光而行" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "日日向光｜每天一句，向光而行",
+      description: "每天一句原创励志短句，每天一套全新视觉风格。",
+      images: [imageUrl],
+    },
+  };
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="zh-CN">
+      <body>{children}</body>
+    </html>
+  );
+}

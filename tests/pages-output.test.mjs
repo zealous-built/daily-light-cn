@@ -14,16 +14,17 @@ test("builds a GitHub Pages entry with repository-relative assets", async () => 
   assert.doesNotMatch(html, /src="\/assets\//);
 });
 
-test("locks the experience to one viewport without page scrolling", async () => {
+test("covers the viewport edge with a tiny vertical bleed and no horizontal scrollbar", async () => {
   const css = await readFile(
     new URL("../app/globals.css", import.meta.url),
     "utf8",
   );
 
-  assert.match(css, /html,\s*\nbody\s*\{[^}]*height:\s*100%[^}]*overflow:\s*hidden/s);
-  assert.match(css, /#root\s*\{[^}]*height:\s*100%[^}]*overflow:\s*hidden/s);
+  assert.match(css, /html,\s*\nbody\s*\{[^}]*overflow-x:\s*hidden[^}]*overflow-y:\s*auto/s);
+  assert.match(css, /#root\s*\{[^}]*min-height:\s*calc\(100% \+ 8px\)/s);
   assert.match(css, /html,\s*\nbody\s*\{[^}]*background:\s*var\(--page-background,\s*#082f3d\)/s);
   assert.match(css, /#root\s*\{[^}]*background:\s*var\(--page-background,\s*#082f3d\)/s);
-  assert.match(css, /\.daily-page\s*\{[^}]*position:\s*fixed[^}]*inset:\s*-2px/s);
+  assert.match(css, /\.daily-page\s*\{[^}]*position:\s*relative[^}]*min-height:\s*calc\(100dvh \+ 8px\)/s);
+  assert.match(css, /body::-webkit-scrollbar\s*\{[^}]*width:\s*0[^}]*height:\s*0/s);
   assert.match(css, /grid-template-rows:\s*auto minmax\(0,\s*1fr\) auto/);
 });

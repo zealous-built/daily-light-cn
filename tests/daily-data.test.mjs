@@ -2,18 +2,36 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getDailyExperience,
+  getDayPeriod,
   getLocalDayKey,
   quotes,
   themes,
 } from "../app/daily.ts";
 
-test("ships 366 unique historical classics with translations and sources", () => {
-  assert.equal(quotes.length, 366);
-  assert.equal(new Set(quotes.map((quote) => quote.id)).size, 366);
-  assert.equal(new Set(quotes.map((quote) => quote.text)).size, 366);
+test("ships a curated, non-repeating run of motivational classics", () => {
+  assert.ok(quotes.length >= 60);
+  assert.equal(new Set(quotes.map((quote) => quote.id)).size, quotes.length);
+  assert.equal(new Set(quotes.map((quote) => quote.text)).size, quotes.length);
   assert.ok(quotes.every((quote) => quote.text.trim().length >= 6));
   assert.ok(quotes.every((quote) => quote.translation.trim().length >= 6));
-  assert.ok(quotes.every((quote) => quote.dynasty && quote.author && quote.source));
+  assert.ok(
+    quotes.every(
+      (quote) =>
+        quote.dynasty
+        && quote.author
+        && quote.source
+        && quote.category,
+    ),
+  );
+});
+
+test("maps local time to the three selected classical backgrounds", () => {
+  assert.equal(getDayPeriod(new Date(2026, 6, 30, 4, 59)), "evening");
+  assert.equal(getDayPeriod(new Date(2026, 6, 30, 5, 0)), "morning");
+  assert.equal(getDayPeriod(new Date(2026, 6, 30, 11, 59)), "morning");
+  assert.equal(getDayPeriod(new Date(2026, 6, 30, 12, 0)), "afternoon");
+  assert.equal(getDayPeriod(new Date(2026, 6, 30, 17, 59)), "afternoon");
+  assert.equal(getDayPeriod(new Date(2026, 6, 30, 18, 0)), "evening");
 });
 
 test("ships 120 complete, uniquely named themes", () => {

@@ -7,7 +7,10 @@ export type DailyQuote = {
   dynasty: string;
   author: string;
   source: string;
+  category: string;
 };
+
+export type DayPeriod = "morning" | "afternoon" | "evening";
 
 export type ThemeDefinition = {
   id: string;
@@ -105,7 +108,16 @@ const quoteEndings = [
   "愿你带着勇气出发，也带着从容归来。",
 ] as const;
 
-export const quotes: DailyQuote[] = classics.map((quote) => ({ ...quote }));
+const motivationalQuoteIds = new Set([
+  1, 2, 3, 4, 6, 9, 14, 15, 18, 19, 21, 26, 27, 28, 29, 31, 32, 33, 35,
+  37, 38, 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 52, 53, 54, 55, 56, 57,
+  58, 59, 64, 69, 70, 75, 87, 90, 94, 95, 98, 107, 108, 110, 113, 115,
+  117, 118, 119, 121, 122, 124, 125, 126, 138, 140, 143, 145, 147, 148,
+].map((id) => `classic-${String(id).padStart(3, "0")}`));
+
+export const quotes: DailyQuote[] = classics
+  .filter((quote) => motivationalQuoteIds.has(quote.id))
+  .map((quote) => ({ ...quote }));
 
 const families = [
   { name: "留白编辑", layout: "editorial", decor: "lines", motion: "reveal", font: '"Noto Serif SC","Songti SC","STSong",serif', weight: 600, spacing: ".05em", radius: "2px" },
@@ -175,6 +187,13 @@ export function getLocalDayNumber(date = new Date()) {
   return Math.floor(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_MS,
   );
+}
+
+export function getDayPeriod(date = new Date()): DayPeriod {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 12) return "morning";
+  if (hour >= 12 && hour < 18) return "afternoon";
+  return "evening";
 }
 
 export function getDailyExperience(date = new Date()) {

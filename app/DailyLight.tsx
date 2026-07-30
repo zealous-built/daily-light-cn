@@ -2,9 +2,26 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
-import { getDailyExperience, themes } from "./daily";
+import { getDailyExperience, getDayPeriod, themes } from "./daily";
 
 type Feedback = "idle" | "copied" | "shared" | "failed";
+
+const assetBase = import.meta.env.BASE_URL || "/";
+
+const periodDetails = {
+  morning: {
+    label: "晨 · 水墨远山",
+    image: `url("${assetBase}background-morning.jpg")`,
+  },
+  afternoon: {
+    label: "午 · 宣纸竹影",
+    image: `url("${assetBase}background-afternoon.jpg")`,
+  },
+  evening: {
+    label: "夜 · 青绿山河",
+    image: `url("${assetBase}background-evening.jpg")`,
+  },
+} as const;
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("zh-CN", {
@@ -36,6 +53,8 @@ export function DailyLight() {
   const [feedback, setFeedback] = useState<Feedback>("idle");
   const experience = useMemo(() => getDailyExperience(now), [now]);
   const theme = experience.theme;
+  const period = getDayPeriod(now);
+  const periodDetail = periodDetails[period];
 
   useEffect(() => {
     const root = document.documentElement;
@@ -49,45 +68,49 @@ export function DailyLight() {
     };
   }, [theme.background]);
 
-  const refreshDate = useCallback(() => {
+  const refreshExperience = useCallback(() => {
     setNow((current) => {
       const next = new Date();
       return getDailyExperience(current).dayKey === getDailyExperience(next).dayKey
+        && getDayPeriod(current) === getDayPeriod(next)
         ? current
         : next;
     });
   }, []);
 
   useEffect(() => {
-    const scheduleNextMidnight = () => {
+    const scheduleNextChange = () => {
       const current = new Date();
-      const next = new Date(
-        current.getFullYear(),
-        current.getMonth(),
-        current.getDate() + 1,
-        0,
-        0,
-        0,
-        80,
-      );
+      const candidates = [5, 12, 18].map((hour) => {
+        const candidate = new Date(current);
+        candidate.setHours(hour, 0, 0, 80);
+        if (candidate <= current) candidate.setDate(candidate.getDate() + 1);
+        return candidate;
+      });
+      const midnight = new Date(current);
+      midnight.setDate(midnight.getDate() + 1);
+      midnight.setHours(0, 0, 0, 80);
+      const next = [...candidates, midnight].sort(
+        (a, b) => a.getTime() - b.getTime(),
+      )[0];
       return window.setTimeout(() => {
         setNow(new Date());
-        timer = scheduleNextMidnight();
+        timer = scheduleNextChange();
       }, next.getTime() - current.getTime());
     };
 
-    let timer = scheduleNextMidnight();
+    let timer = scheduleNextChange();
     const handleVisibility = () => {
-      if (document.visibilityState === "visible") refreshDate();
+      if (document.visibilityState === "visible") refreshExperience();
     };
     document.addEventListener("visibilitychange", handleVisibility);
-    window.addEventListener("focus", refreshDate);
+    window.addEventListener("focus", refreshExperience);
     return () => {
       window.clearTimeout(timer);
       document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("focus", refreshDate);
+      window.removeEventListener("focus", refreshExperience);
     };
-  }, [refreshDate]);
+  }, [refreshExperience]);
 
   useEffect(() => {
     if (feedback === "idle") return;
@@ -148,6 +171,7 @@ export function DailyLight() {
     "--tracking": theme.letterSpacing,
     "--radius": theme.radius,
     "--card-shadow": theme.shadow,
+    "--period-image": periodDetail.image,
   } as CSSProperties;
 
   const themeNumber = Number(theme.id.slice(-3));
@@ -165,6 +189,7 @@ export function DailyLight() {
       className={`daily-page layout-${theme.layout} decor-${theme.decor} motion-${theme.motion}`}
       style={style}
       data-day={experience.dayKey}
+      data-period={period}
     >
       <div className="ambient" aria-hidden="true">
         <i />
@@ -193,7 +218,7 @@ export function DailyLight() {
         <div className="date-line">
           <span>{formatDate(now)}</span>
           <i aria-hidden="true" />
-          <span>古今相照</span>
+          <span>{periodDetail.label}</span>
         </div>
 
         <div className="quote-card">

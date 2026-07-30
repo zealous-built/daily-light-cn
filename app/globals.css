@@ -67,9 +67,31 @@ button {
   overflow: hidden;
   padding: clamp(18px, 3.2vh, 42px) clamp(20px, 5vw, 74px) clamp(16px, 2.5vh, 30px);
   color: var(--fg);
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(
+      110deg,
+      color-mix(in srgb, var(--bg) 56%, transparent),
+      color-mix(in srgb, var(--bg) 32%, transparent)
+    ),
+    var(--period-image);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  transition: color .5s ease, background .5s ease;
+  transition: color .5s ease, background-color .5s ease;
+}
+
+.daily-page[data-period="morning"] {
+  background-position: center 48%;
+}
+
+.daily-page[data-period="afternoon"] {
+  background-position: center 44%;
+}
+
+.daily-page[data-period="evening"] {
+  background-position: center 52%;
 }
 
 .daily-page::before,
@@ -198,9 +220,9 @@ button {
   padding: clamp(24px, 3.6vh, 44px) clamp(24px, 3.6vw, 54px);
   border: 1px solid color-mix(in srgb, var(--fg) 16%, transparent);
   border-radius: var(--radius);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg));
   box-shadow: var(--card-shadow);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px) saturate(.88);
 }
 
 .classic-compare {

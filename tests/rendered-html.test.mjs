@@ -25,10 +25,12 @@ test("server-renders the daily light experience and metadata", async () => {
 
   const html = await response.text();
   assert.match(html, /<html lang="zh-CN">/);
-  assert.match(html, /<title>日日向光｜每天一句，向光而行<\/title>/);
+  assert.match(html, /<title>日日向光｜每日古文，古今相照<\/title>/);
   assert.match(html, /日日向光/);
-  assert.match(html, /今日有光/);
-  assert.match(html, /复制文案/);
+  assert.match(html, /古今相照/);
+  assert.match(html, />古文</);
+  assert.match(html, />今译</);
+  assert.match(html, /复制古今/);
   assert.match(html, /分享今日/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/);
 });

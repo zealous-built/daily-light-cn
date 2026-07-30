@@ -95,7 +95,13 @@ export function DailyLight() {
     return () => window.clearTimeout(timer);
   }, [feedback]);
 
-  const shareText = `今日有光：${experience.quote.text}\n\n—— 日日向光`;
+  const shareText = [
+    `古文：${experience.quote.text}`,
+    `出处：${experience.quote.dynasty} · ${experience.quote.author} · ${experience.quote.source}`,
+    `今译：${experience.quote.translation}`,
+    "",
+    "—— 日日向光",
+  ].join("\n");
 
   const handleCopy = async () => {
     try {
@@ -110,7 +116,7 @@ export function DailyLight() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: "日日向光｜今日有光",
+          title: "日日向光｜今日古文",
           text: shareText,
           url: window.location.href,
         });
@@ -187,24 +193,46 @@ export function DailyLight() {
         <div className="date-line">
           <span>{formatDate(now)}</span>
           <i aria-hidden="true" />
-          <span>今日有光</span>
+          <span>古今相照</span>
         </div>
 
         <div className="quote-card">
-          <span className="quote-mark" aria-hidden="true">“</span>
-          <h1 id="daily-quote" key={experience.dayKey}>
-            {experience.quote.text}
-          </h1>
-          <div className="signature">
-            <span />
-            <p>愿今天的你，心里有方向，脚下有力量。</p>
+          <div className="classic-compare" key={experience.dayKey}>
+            <article className="original-pane">
+              <div className="pane-label">
+                <span>古文</span>
+                <small>ORIGINAL</small>
+              </div>
+              <span className="quote-mark" aria-hidden="true">“</span>
+              <h1 id="daily-quote">{experience.quote.text}</h1>
+              <p className="source-line">
+                {experience.quote.dynasty}
+                <i aria-hidden="true">·</i>
+                {experience.quote.author}
+                <i aria-hidden="true">·</i>
+                {experience.quote.source}
+              </p>
+            </article>
+
+            <div className="compare-divider" aria-hidden="true">
+              <span>今</span>
+            </div>
+
+            <article className="translation-pane">
+              <div className="pane-label">
+                <span>今译</span>
+                <small>TRANSLATION</small>
+              </div>
+              <p className="translation-text">{experience.quote.translation}</p>
+              <p className="translation-note">古意不远，照见今日。</p>
+            </article>
           </div>
         </div>
 
-        <div className="actions" aria-label="今日文案操作">
+        <div className="actions" aria-label="今日古文操作">
           <button type="button" onClick={handleCopy}>
             <span aria-hidden="true">⧉</span>
-            复制文案
+            复制古今
           </button>
           <button type="button" className="primary-action" onClick={handleShare}>
             <span aria-hidden="true">↗</span>
@@ -214,8 +242,8 @@ export function DailyLight() {
       </section>
 
       <footer className="site-footer">
-        <p><span aria-hidden="true">✦</span> 每日零点，换一种心情</p>
-        <p>同一天，同一句光</p>
+        <p><span aria-hidden="true">✦</span> 每日零点，读一句古文</p>
+        <p>左读古意，右见今心</p>
       </footer>
 
       <div className={`toast ${feedback !== "idle" ? "is-visible" : ""}`} role="status" aria-live="polite">

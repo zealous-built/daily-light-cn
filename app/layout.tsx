@@ -7,25 +7,25 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
   const origin = host ? `${protocol}://${host}` : "http://localhost:4321";
-  const imageUrl = new URL("/og.png", origin).toString();
+  const imageUrl = new URL("/og-classics.png", origin).toString();
 
   return {
-    title: "日日向光｜每天一句，向光而行",
-    description: "每天零点更新一句原创励志短句与一套全新视觉风格，让每次打开都有新的力量。",
+    title: "日日向光｜每日古文，古今相照",
+    description: "每天零点更新一句真实古典诗文与对应白话译文，并呈现一套全新视觉风格。",
     applicationName: "日日向光",
-    keywords: ["每日一句", "励志", "日签", "正能量", "日日向光"],
+    keywords: ["每日古文", "古诗词", "白话译文", "日签", "日日向光"],
     openGraph: {
-      title: "日日向光｜每天一句，向光而行",
-      description: "每天一句原创励志短句，每天一套全新视觉风格。",
+      title: "日日向光｜每日古文，古今相照",
+      description: "屏幕左读古文，右读今译；每天一句，每天一景。",
       type: "website",
       locale: "zh_CN",
       siteName: "日日向光",
-      images: [{ url: imageUrl, width: 1536, height: 1024, alt: "日日向光｜每天一句，向光而行" }],
+      images: [{ url: imageUrl, width: 1536, height: 1024, alt: "日日向光｜每日古文，古今相照" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: "日日向光｜每天一句，向光而行",
-      description: "每天一句原创励志短句，每天一套全新视觉风格。",
+      title: "日日向光｜每日古文，古今相照",
+      description: "屏幕左读古文，右读今译；每天一句，每天一景。",
       images: [imageUrl],
     },
   };

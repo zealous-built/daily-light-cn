@@ -1,6 +1,12 @@
+import { classics } from "./classics.ts";
+
 export type DailyQuote = {
   id: string;
   text: string;
+  translation: string;
+  dynasty: string;
+  author: string;
+  source: string;
 };
 
 export type ThemeDefinition = {
@@ -99,12 +105,7 @@ const quoteEndings = [
   "愿你带着勇气出发，也带着从容归来。",
 ] as const;
 
-export const quotes: DailyQuote[] = quoteEndings.flatMap((ending, endingIndex) =>
-  quoteLeads.map((lead, leadIndex) => ({
-    id: `quote-${String(endingIndex * quoteLeads.length + leadIndex + 1).padStart(3, "0")}`,
-    text: `${lead}，${ending}`,
-  })),
-);
+export const quotes: DailyQuote[] = classics.map((quote) => ({ ...quote }));
 
 const families = [
   { name: "留白编辑", layout: "editorial", decor: "lines", motion: "reveal", font: '"Noto Serif SC","Songti SC","STSong",serif', weight: 600, spacing: ".05em", radius: "2px" },

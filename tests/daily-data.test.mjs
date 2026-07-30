@@ -7,11 +7,13 @@ import {
   themes,
 } from "../app/daily.ts";
 
-test("ships 366 unique original quotes", () => {
+test("ships 366 unique historical classics with translations and sources", () => {
   assert.equal(quotes.length, 366);
   assert.equal(new Set(quotes.map((quote) => quote.id)).size, 366);
   assert.equal(new Set(quotes.map((quote) => quote.text)).size, 366);
-  assert.ok(quotes.every((quote) => quote.text.trim().length >= 20));
+  assert.ok(quotes.every((quote) => quote.text.trim().length >= 6));
+  assert.ok(quotes.every((quote) => quote.translation.trim().length >= 6));
+  assert.ok(quotes.every((quote) => quote.dynasty && quote.author && quote.source));
 });
 
 test("ships 120 complete, uniquely named themes", () => {

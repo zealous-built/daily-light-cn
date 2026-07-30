@@ -4,6 +4,7 @@ import {
   getDailyExperience,
   getDayPeriod,
   getLocalDayKey,
+  getPeriodIndex,
   quotes,
   themes,
 } from "../app/daily.ts";
@@ -32,6 +33,20 @@ test("maps local time to the three selected classical backgrounds", () => {
   assert.equal(getDayPeriod(new Date(2026, 6, 30, 12, 0)), "afternoon");
   assert.equal(getDayPeriod(new Date(2026, 6, 30, 17, 59)), "afternoon");
   assert.equal(getDayPeriod(new Date(2026, 6, 30, 18, 0)), "evening");
+  assert.equal(getPeriodIndex(new Date(2026, 6, 30, 8, 0)), 0);
+  assert.equal(getPeriodIndex(new Date(2026, 6, 30, 13, 0)), 1);
+  assert.equal(getPeriodIndex(new Date(2026, 6, 30, 20, 0)), 2);
+});
+
+test("keeps the displayed translation within the quoted original", () => {
+  const quote = quotes.find((item) =>
+    item.text === "受任于败军之际，奉命于危难之间"
+  );
+  assert.equal(
+    quote?.translation,
+    "在兵败之际接受任命，在危难之中奉行使命。",
+  );
+  assert.doesNotMatch(quote?.translation ?? "", /二十一年/);
 });
 
 test("ships 120 complete, uniquely named themes", () => {
@@ -56,33 +71,38 @@ test("ships 120 complete, uniquely named themes", () => {
   }
 });
 
-test("keeps a local day stable and changes both selections tomorrow", () => {
-  const morning = new Date(2026, 6, 29, 8, 15);
-  const evening = new Date(2026, 6, 29, 23, 59);
-  const tomorrow = new Date(2026, 6, 30, 0, 0);
-  const first = getDailyExperience(morning);
-  const sameDay = getDailyExperience(evening);
-  const nextDay = getDailyExperience(tomorrow);
+test("changes the complete experience exactly three times per day", () => {
+  const morning = getDailyExperience(new Date(2026, 6, 29, 5, 0));
+  const morningLater = getDailyExperience(new Date(2026, 6, 29, 11, 59));
+  const afternoon = getDailyExperience(new Date(2026, 6, 29, 12, 0));
+  const evening = getDailyExperience(new Date(2026, 6, 29, 18, 0));
+  const afterMidnight = getDailyExperience(new Date(2026, 6, 30, 0, 30));
+  const nextMorning = getDailyExperience(new Date(2026, 6, 30, 5, 0));
 
-  assert.equal(getLocalDayKey(morning), "2026-07-29");
-  assert.equal(first.quote.id, sameDay.quote.id);
-  assert.equal(first.theme.id, sameDay.theme.id);
-  assert.notEqual(first.quote.id, nextDay.quote.id);
-  assert.notEqual(first.theme.id, nextDay.theme.id);
+  assert.equal(getLocalDayKey(new Date(2026, 6, 29)), "2026-07-29");
+  assert.equal(morning.experienceKey, morningLater.experienceKey);
+  assert.notEqual(morning.quote.id, afternoon.quote.id);
+  assert.notEqual(afternoon.quote.id, evening.quote.id);
+  assert.notEqual(morning.theme.id, afternoon.theme.id);
+  assert.notEqual(afternoon.theme.id, evening.theme.id);
+  assert.equal(evening.experienceKey, afterMidnight.experienceKey);
+  assert.equal(evening.quote.id, afterMidnight.quote.id);
+  assert.equal(evening.theme.id, afterMidnight.theme.id);
+  assert.notEqual(evening.experienceKey, nextMorning.experienceKey);
 });
 
-test("handles month, year and leap-day boundaries", () => {
+test("handles month, year and leap-day morning boundaries", () => {
   const boundaries = [
-    [new Date(2026, 0, 31, 23, 59), new Date(2026, 1, 1, 0, 0)],
-    [new Date(2026, 11, 31, 23, 59), new Date(2027, 0, 1, 0, 0)],
-    [new Date(2028, 1, 28, 23, 59), new Date(2028, 1, 29, 0, 0)],
-    [new Date(2028, 1, 29, 23, 59), new Date(2028, 2, 1, 0, 0)],
+    [new Date(2026, 1, 1, 4, 59), new Date(2026, 1, 1, 5, 0)],
+    [new Date(2027, 0, 1, 4, 59), new Date(2027, 0, 1, 5, 0)],
+    [new Date(2028, 1, 29, 4, 59), new Date(2028, 1, 29, 5, 0)],
+    [new Date(2028, 2, 1, 4, 59), new Date(2028, 2, 1, 5, 0)],
   ];
 
   for (const [before, after] of boundaries) {
     const first = getDailyExperience(before);
     const second = getDailyExperience(after);
-    assert.notEqual(first.dayKey, second.dayKey);
+    assert.notEqual(first.experienceKey, second.experienceKey);
     assert.notEqual(first.quote.id, second.quote.id);
     assert.notEqual(first.theme.id, second.theme.id);
   }

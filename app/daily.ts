@@ -196,12 +196,37 @@ export function getDayPeriod(date = new Date()): DayPeriod {
   return "evening";
 }
 
+export function getPeriodIndex(date = new Date()) {
+  const period = getDayPeriod(date);
+  if (period === "morning") return 0;
+  if (period === "afternoon") return 1;
+  return 2;
+}
+
+function getExperienceDate(date: Date) {
+  if (date.getHours() >= 5) return date;
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() - 1,
+    18,
+  );
+}
+
 export function getDailyExperience(date = new Date()) {
-  const dayNumber = getLocalDayNumber(date);
+  const experienceDate = getExperienceDate(date);
+  const dayNumber = getLocalDayNumber(experienceDate);
+  const period = getDayPeriod(date);
+  const periodIndex = getPeriodIndex(date);
+  const slotNumber = dayNumber * 3 + periodIndex;
   return {
-    dayKey: getLocalDayKey(date),
+    dayKey: getLocalDayKey(experienceDate),
     dayNumber,
-    quote: quotes[modulo(dayNumber, quotes.length)],
-    theme: themes[modulo(dayNumber, themes.length)],
+    period,
+    periodIndex,
+    slotNumber,
+    experienceKey: `${getLocalDayKey(experienceDate)}-${period}`,
+    quote: quotes[modulo(slotNumber, quotes.length)],
+    theme: themes[modulo(slotNumber, themes.length)],
   };
 }

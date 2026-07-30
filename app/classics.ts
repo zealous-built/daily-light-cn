@@ -425,7 +425,7 @@ export const classics = [
   {
     "id": "classic-048",
     "text": "受任于败军之际，奉命于危难之间",
-    "translation": "在兵败的时候接受任务，在危机患难之间奉行使命，到如今已经有二十一年了。",
+    "translation": "在兵败之际接受任命，在危难之中奉行使命。",
     "dynasty": "两汉",
     "author": "诸葛亮",
     "source": "《前出师表》",

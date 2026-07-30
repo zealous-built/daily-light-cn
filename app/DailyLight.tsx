@@ -71,8 +71,8 @@ export function DailyLight() {
   const refreshExperience = useCallback(() => {
     setNow((current) => {
       const next = new Date();
-      return getDailyExperience(current).dayKey === getDailyExperience(next).dayKey
-        && getDayPeriod(current) === getDayPeriod(next)
+      return getDailyExperience(current).experienceKey
+        === getDailyExperience(next).experienceKey
         ? current
         : next;
     });
@@ -188,7 +188,7 @@ export function DailyLight() {
     <main
       className={`daily-page layout-${theme.layout} decor-${theme.decor} motion-${theme.motion}`}
       style={style}
-      data-day={experience.dayKey}
+      data-day={experience.experienceKey}
       data-period={period}
     >
       <div className="ambient" aria-hidden="true">
@@ -222,7 +222,7 @@ export function DailyLight() {
         </div>
 
         <div className="quote-card">
-          <div className="classic-compare" key={experience.dayKey}>
+          <div className="classic-compare" key={experience.experienceKey}>
             <article className="original-pane">
               <div className="pane-label">
                 <span>古文</span>
